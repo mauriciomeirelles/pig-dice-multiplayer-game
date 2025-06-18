@@ -10,15 +10,22 @@ type AppState =
 function App() {
   const [appState, setAppState] = useState<AppState>({ screen: 'lobby' });
 
-  const handleGameCreated = (gameCode: string, playerId: string) => {
-    // For created games, we need to get the game ID from the game code
-    // We'll handle this in the GameBoard component by looking it up
-    setAppState({
-      screen: 'game',
-      gameId: gameCode, // We'll use gameCode as gameId for now and fix in GameBoard
-      playerId,
-      gameCode
-    });
+  const handleGameCreated = async (gameCode: string, playerId: string) => {
+    try {
+      // Get the actual game ID from the game code
+      const gameApi = await import('./lib/gameApi');
+      const gameState = await gameApi.getGameState(gameCode);
+      setAppState({
+        screen: 'game',
+        gameId: gameState.game.id,
+        playerId,
+        gameCode
+      });
+    } catch (error) {
+      console.error('Error fetching game state:', error);
+      // Fallback to lobby if we can't get the game state
+      setAppState({ screen: 'lobby' });
+    }
   };
 
   const handleGameJoined = (gameId: string, playerId: string) => {

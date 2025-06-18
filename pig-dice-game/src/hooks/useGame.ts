@@ -150,7 +150,6 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
       const result = await gameApi.rollDiceAction(gameId, playerId);
       
       // Simulate rolling animation
-      const startTime = Date.now();
       const interval = setInterval(() => {
         setDiceValue(Math.floor(Math.random() * 6) + 1);
       }, 100);

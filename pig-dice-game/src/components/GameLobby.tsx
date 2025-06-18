@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import * as gameApi from '../lib/gameApi';
 
 interface GameLobbyProps {
-  onGameCreated: (gameCode: string, playerId: string) => void;
+  onGameCreated: (gameCode: string, playerId: string) => Promise<void>;
   onGameJoined: (gameId: string, playerId: string) => void;
 }
 
 interface CreateGameFormProps {
-  onGameCreated: (gameCode: string, playerId: string) => void;
+  onGameCreated: (gameCode: string, playerId: string) => Promise<void>;
 }
 
 interface JoinGameFormProps {
@@ -28,7 +28,7 @@ function CreateGameForm({ onGameCreated }: CreateGameFormProps) {
       setLoading(true);
       setError(null);
       const { gameCode, playerId } = await gameApi.createGame(playerName.trim());
-      onGameCreated(gameCode, playerId);
+      await onGameCreated(gameCode, playerId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create game');
     } finally {
