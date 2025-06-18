@@ -1,0 +1,467 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Game Logic and State Management Rules for Pig Dice Game
+
+## Game State Management
+
+<rule>
+name: game_state_management
+description: Define consistent game state management patterns
+filters:
+  - type: file_pattern
+    pattern: "src/(hooks|utils)/.*\\.ts$"
+
+actions:
+  - type: suggest
+    message: |
+      Follow these game state management patterns:
+
+      ## Core Game Rules Implementation:
+      ```typescript
+      // Game constants
+      export const GAME_CONSTANTS = {
+        TARGET_SCORE: 100,
+        BUST_VALUE: 1,
+        MIN_PLAYERS: 2,
+        MAX_PLAYERS: 6,
+        GAME_CODE_LENGTH: 6
+      } as const;
+
+      // Game rule validation
+      export function validateGameAction(
+        action: 'roll' | 'hold',
+        gameState: Game,
+        playerId: string
+      ): { valid: boolean; error?: string } {
+        // Only current player can act
+        if (gameState.currentPlayerId !== playerId) {
+          return { valid: false, error: 'Not your turn' };
+        }
+
+        // Game must be active
+        if (gameState.status !== 'active') {
+          return { valid: false, error: 'Game not active' };
+        }
+
+        // Hold requires turn score > 0
+        if (action === 'hold') {
+          const player = getPlayerById(playerId);
+          if (player?.turnScore === 0) {
+            return { valid: false, error: 'No points to hold' };
+          }
+        }
+
+        return { valid: true };
+      }
+
+      // Turn management
+      export function getNextPlayer(
+        players: Player[], 
+        currentPlayerId: string
+      ): Player | null {
+        const currentIndex = players.findIndex(p => p.id === currentPlayerId);
+        if (currentIndex === -1) return null;
+        
+        const nextIndex = (currentIndex + 1) % players.length;
+        return players[nextIndex];
+      }
+
+      // Win condition check
+      export function checkWinCondition(
+        player: Player, 
+        targetScore: number = GAME_CONSTANTS.TARGET_SCORE
+      ): boolean {
+        return player.totalScore >= targetScore;
+      }
+
+      // Score calculation
+      export function calculateScores(
+        currentScore: number,
+        turnScore: number,
+        diceValue: number
+      ): { newTurnScore: number; newTotalScore: number; isBust: boolean } {
+        const isBust = diceValue === GAME_CONSTANTS.BUST_VALUE;
+        
+        if (isBust) {
+          return {
+            newTurnScore: 0,
+            newTotalScore: currentScore, // No change on bust
+            isBust: true
+          };
+        }
+        
+        return {
+          newTurnScore: turnScore + diceValue,
+          newTotalScore: currentScore, // Only changes on hold
+          isBust: false
+        };
+      }
+      ```
+
+examples:
+  - input: "Implementing game state hook"
+    output: |
+      ```typescript
+      export const useGameState = (gameId: string) => {
+        const [game, setGame] = useState<Game | null>(null);
+        const [players, setPlayers] = useState<Player[]>([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState<string | null>(null);
+
+        // Validate action before executing
+        const executeAction = useCallback(async (
+          action: 'roll' | 'hold',
+          playerId: string
+        ) => {
+          if (!game) return;
+          
+          const validation = validateGameAction(action, game, playerId);
+          if (!validation.valid) {
+            setError(validation.error || 'Invalid action');
+            return;
+          }
+
+          try {
+            if (action === 'roll') {
+              await rollDice(gameId, playerId);
+            } else {
+              await holdTurn(gameId, playerId);
+            }
+          } catch (err) {
+            setError(err instanceof Error ? err.message : 'Action failed');
+          }
+        }, [game, gameId]);
+
+        return {
+          game,
+          players,
+          loading,
+          error,
+          executeAction,
+          currentPlayer: game?.currentPlayerId ? 
+            players.find(p => p.id === game.currentPlayerId) : null
+        };
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## Dice Logic Implementation
+
+<rule>
+name: dice_logic_implementation
+description: Define dice rolling logic and animation handling
+filters:
+  - type: content
+    pattern: "dice|roll|random"
+
+actions:
+  - type: suggest
+    message: |
+      Implement dice logic with these patterns:
+
+      ## Client-Side Dice Animation:
+      ```typescript
+      export const useDice = () => {
+        const [isRolling, setIsRolling] = useState(false);
+        const [diceValue, setDiceValue] = useState<number | null>(null);
+        const [animationValue, setAnimationValue] = useState<number>(1);
+
+        const rollDice = useCallback(async (
+          onServerRoll: () => Promise<number>
+        ): Promise<number> => {
+          setIsRolling(true);
+          setDiceValue(null);
+
+          // Animate dice rolling (client-side visual only)
+          const animationInterval = setInterval(() => {
+            setAnimationValue(Math.floor(Math.random() * 6) + 1);
+          }, 100);
+
+          try {
+            // Get actual result from server (anti-cheat)
+            const result = await onServerRoll();
+            
+            // Stop animation and show result
+            clearInterval(animationInterval);
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            setDiceValue(result);
+            setAnimationValue(result);
+            setIsRolling(false);
+            
+            return result;
+          } catch (error) {
+            clearInterval(animationInterval);
+            setIsRolling(false);
+            throw error;
+          }
+        }, []);
+
+        const resetDice = useCallback(() => {
+          setDiceValue(null);
+          setAnimationValue(1);
+          setIsRolling(false);
+        }, []);
+
+        return {
+          isRolling,
+          diceValue,
+          animationValue,
+          rollDice,
+          resetDice
+        };
+      };
+      ```
+
+      ## Dice Value Display:
+      ```typescript
+      export function getDiceEmoji(value: number): string {
+        const diceEmojis = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+        return diceEmojis[value - 1] || '🎲';
+      }
+
+      export function getDiceDisplayValue(
+        value: number | null, 
+        isRolling: boolean
+      ): string {
+        if (isRolling) return '🎲';
+        if (value === null) return '🎲';
+        return getDiceEmoji(value);
+      }
+
+      // Dice result classification
+      export function classifyDiceResult(value: number): 'bust' | 'safe' | 'good' {
+        if (value === 1) return 'bust';
+        if (value <= 3) return 'safe';
+        return 'good';
+      }
+      ```
+
+examples:
+  - input: "Creating dice roller component"
+    output: |
+      ```tsx
+      const DiceRoller: React.FC<DiceRollerProps> = ({ 
+        onRoll, 
+        disabled, 
+        loading 
+      }) => {
+        const { isRolling, diceValue, animationValue, rollDice } = useDice();
+
+        const handleRoll = useCallback(async () => {
+          try {
+            const result = await rollDice(onRoll);
+            // Handle result (animations, sounds, etc.)
+          } catch (error) {
+            console.error('Dice roll failed:', error);
+          }
+        }, [rollDice, onRoll]);
+
+        const displayValue = getDiceDisplayValue(
+          isRolling ? animationValue : diceValue, 
+          isRolling
+        );
+
+        const resultClass = diceValue ? classifyDiceResult(diceValue) : '';
+
+        return (
+          <div className="dice-roller">
+            <div className={`dice ${isRolling ? 'rolling' : ''} ${resultClass}`}>
+              {displayValue}
+            </div>
+            <button 
+              onClick={handleRoll}
+              disabled={disabled || loading || isRolling}
+              className="roll-button"
+            >
+              {isRolling ? 'Rolling...' : 'Roll Dice'}
+            </button>
+          </div>
+        );
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## Turn Management Logic
+
+<rule>
+name: turn_management_logic
+description: Define turn-based game flow and player management
+filters:
+  - type: content
+    pattern: "turn|player.*order|current.*player"
+
+actions:
+  - type: suggest
+    message: |
+      Implement turn management with these patterns:
+
+      ## Turn State Management:
+      ```typescript
+      export interface TurnState {
+        currentPlayerId: string;
+        turnScore: number;
+        canRoll: boolean;
+        canHold: boolean;
+        mustSwitchTurn: boolean;
+      }
+
+      export function calculateTurnState(
+        game: Game,
+        players: Player[],
+        currentUserId: string
+      ): TurnState {
+        const currentPlayer = players.find(p => p.id === game.currentPlayerId);
+        const isMyTurn = game.currentPlayerId === currentUserId;
+        
+        return {
+          currentPlayerId: game.currentPlayerId || '',
+          turnScore: currentPlayer?.turnScore || 0,
+          canRoll: isMyTurn && game.status === 'active',
+          canHold: isMyTurn && (currentPlayer?.turnScore || 0) > 0,
+          mustSwitchTurn: false
+        };
+      }
+
+      // Turn transition logic
+      export async function switchToNextPlayer(
+        gameId: string,
+        currentPlayers: Player[]
+      ): Promise<void> {
+        const { data: game } = await supabase
+          .from('games')
+          .select('current_player_id')
+          .eq('id', gameId)
+          .single();
+
+        if (!game?.current_player_id) return;
+
+        const nextPlayer = getNextPlayer(currentPlayers, game.current_player_id);
+        if (!nextPlayer) return;
+
+        await supabase
+          .from('games')
+          .update({ 
+            current_player_id: nextPlayer.id,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', gameId);
+      }
+
+      // Reset turn scores for all players
+      export async function resetAllTurnScores(gameId: string): Promise<void> {
+        await supabase
+          .from('players')
+          .update({ turn_score: 0 })
+          .eq('game_id', gameId);
+      }
+      ```
+
+      ## Player Order Management:
+      ```typescript
+      export function sortPlayersByOrder(players: Player[]): Player[] {
+        return [...players].sort((a, b) => a.playerOrder - b.playerOrder);
+      }
+
+      export function getPlayerPosition(
+        players: Player[], 
+        playerId: string
+      ): number {
+        const sortedPlayers = sortPlayersByOrder(players);
+        return sortedPlayers.findIndex(p => p.id === playerId) + 1;
+      }
+
+      export function isPlayerActive(
+        player: Player,
+        currentPlayerId: string
+      ): boolean {
+        return player.isActive && player.id === currentPlayerId;
+      }
+
+      // Game flow helpers
+      export function canStartGame(players: Player[]): boolean {
+        return players.length >= GAME_CONSTANTS.MIN_PLAYERS &&
+               players.length <= GAME_CONSTANTS.MAX_PLAYERS;
+      }
+
+      export async function startGame(gameId: string): Promise<void> {
+        const { data: players } = await supabase
+          .from('players')
+          .select('*')
+          .eq('game_id', gameId)
+          .order('player_order');
+
+        if (!canStartGame(players || [])) {
+          throw new Error('Invalid number of players');
+        }
+
+        const firstPlayer = players?.[0];
+        if (!firstPlayer) {
+          throw new Error('No players found');
+        }
+
+        await supabase
+          .from('games')
+          .update({ 
+            status: 'active',
+            current_player_id: firstPlayer.id
+          })
+          .eq('id', gameId);
+      }
+      ```
+
+examples:
+  - input: "Creating turn management hook"
+    output: |
+      ```typescript
+      export const useTurnManagement = (gameId: string, playerId: string) => {
+        const [turnState, setTurnState] = useState<TurnState | null>(null);
+
+        const { game, players } = useGameState(gameId);
+
+        // Calculate turn state when game or players change
+        useEffect(() => {
+          if (game && players.length > 0) {
+            const state = calculateTurnState(game, players, playerId);
+            setTurnState(state);
+          }
+        }, [game, players, playerId]);
+
+        const isMyTurn = useMemo(() => {
+          return turnState?.currentPlayerId === playerId;
+        }, [turnState, playerId]);
+
+        const currentPlayer = useMemo(() => {
+          return players.find(p => p.id === turnState?.currentPlayerId);
+        }, [players, turnState]);
+
+        const myPosition = useMemo(() => {
+          return getPlayerPosition(players, playerId);
+        }, [players, playerId]);
+
+        return {
+          turnState,
+          isMyTurn,
+          currentPlayer,
+          myPosition,
+          canRoll: turnState?.canRoll || false,
+          canHold: turnState?.canHold || false
+        };
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

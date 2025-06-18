@@ -1,0 +1,205 @@
+---
+description: 
+globs: *.tsx,.ts
+alwaysApply: false
+---
+# React Component Architecture Rules for Pig Dice Game
+
+## Core Component Structure
+
+<rule>
+name: core_component_architecture
+description: Define the main component structure for the Pig Dice game
+filters:
+  - type: file_pattern
+    pattern: "src/components/.*\\.(tsx|jsx)$"
+
+actions:
+  - type: suggest
+    message: |
+      Follow this component hierarchy for the Pig Dice game:
+
+      ```
+      src/
+      ├── components/
+      │   ├── App.tsx                 # Main application wrapper
+      │   ├── GameLobby.tsx          # Join/Create game interface
+      │   ├── GameBoard.tsx          # Main game interface
+      │   ├── PlayerList.tsx         # Display all players and scores
+      │   ├── DiceRoller.tsx         # Dice rolling interface
+      │   ├── GameActions.tsx        # Hold/Roll buttons
+      │   ├── GameHistory.tsx        # Recent actions log
+      │   ├── GameStatus.tsx         # Current turn and game state
+      │   └── ui/                    # Reusable UI components
+      │       ├── Button.tsx
+      │       ├── Card.tsx
+      │       ├── Input.tsx
+      │       └── Loading.tsx
+      ```
+
+      Each component should:
+      1. Use functional components with TypeScript
+      2. Export the component as default
+      3. Include proper prop types
+      4. Follow the established naming conventions
+
+examples:
+  - input: "Creating main game component"
+    output: |
+      ```tsx
+      import React from 'react';
+      
+      interface GameBoardProps {
+        gameId: string;
+        currentPlayer: string;
+      }
+      
+      const GameBoard: React.FC<GameBoardProps> = ({ gameId, currentPlayer }) => {
+        return (
+          <div className="game-board">
+            {/* Component content */}
+          </div>
+        );
+      };
+      
+      export default GameBoard;
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## React Hooks Implementation
+
+<rule>
+name: custom_hooks_structure
+description: Define custom hooks for game logic and Supabase integration
+filters:
+  - type: file_pattern
+    pattern: "src/hooks/.*\\.(ts|tsx)$"
+
+actions:
+  - type: suggest
+    message: |
+      Implement these custom hooks for the Pig Dice game:
+
+      1. **useGame**: Manage game state and actions
+      2. **useSupabaseSubscription**: Handle real-time updates
+      3. **useDice**: Handle dice rolling logic
+
+      Hook structure:
+      ```
+      src/
+      ├── hooks/
+      │   ├── useGame.ts
+      │   ├── useSupabaseSubscription.ts
+      │   ├── useDice.ts
+      │   └── index.ts
+      ```
+
+      Each hook should:
+      - Use TypeScript interfaces for parameters and return types
+      - Handle loading and error states
+      - Include proper cleanup in useEffect
+      - Return consistent data structure
+
+examples:
+  - input: "Creating useGame hook"
+    output: |
+      ```typescript
+      import { useState, useEffect } from 'react';
+      import { Game, Player } from '../types';
+      
+      interface UseGameReturn {
+        game: Game | null;
+        players: Player[];
+        loading: boolean;
+        error: string | null;
+        createGame: (playerName: string) => Promise<string>;
+        joinGame: (gameCode: string, playerName: string) => Promise<void>;
+        rollDice: () => Promise<number>;
+        holdTurn: () => Promise<void>;
+      }
+      
+      export const useGame = (gameId?: string): UseGameReturn => {
+        // Hook implementation
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## TypeScript Interface Standards
+
+<rule>
+name: typescript_interfaces
+description: Define TypeScript interfaces for game data structures
+filters:
+  - type: file_pattern
+    pattern: "src/types/.*\\.ts$"
+
+actions:
+  - type: suggest
+    message: |
+      Define these TypeScript interfaces based on the database schema:
+
+      ```typescript
+      // Game Types
+      export interface Game {
+        id: string;
+        gameCode: string;
+        status: 'waiting' | 'active' | 'finished';
+        currentPlayerId: string | null;
+        winnerId: string | null;
+        targetScore: number;
+        createdAt: string;
+        updatedAt: string;
+      }
+
+      export interface Player {
+        id: string;
+        gameId: string;
+        name: string;
+        totalScore: number;
+        turnScore: number;
+        playerOrder: number;
+        isActive: boolean;
+        createdAt: string;
+      }
+
+      export interface GameAction {
+        id: string;
+        gameId: string;
+        playerId: string;
+        actionType: 'roll' | 'hold' | 'bust';
+        diceValue?: number;
+        turnScore: number;
+        totalScore: number;
+        createdAt: string;
+      }
+
+      // Component Props
+      export interface GameBoardProps {
+        gameId: string;
+        playerId: string;
+      }
+
+      export interface PlayerListProps {
+        players: Player[];
+        currentPlayerId: string | null;
+      }
+
+      export interface DiceRollerProps {
+        onRoll: () => Promise<number>;
+        disabled: boolean;
+        loading: boolean;
+      }
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

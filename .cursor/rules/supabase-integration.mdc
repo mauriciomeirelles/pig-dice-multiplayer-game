@@ -1,0 +1,337 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Supabase Integration Rules for Pig Dice Game
+
+## Database Schema Enforcement
+
+<rule>
+name: database_schema_compliance
+description: Ensure database operations follow the defined schema structure
+filters:
+  - type: file_pattern
+    pattern: "src/(lib|services)/.*\\.ts$"
+
+actions:
+  - type: suggest
+    message: |
+      Follow this exact database schema for all Supabase operations:
+
+      ## Tables Structure:
+      
+      ### games table:
+      ```sql
+      CREATE TABLE games (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        game_code VARCHAR(6) UNIQUE NOT NULL,
+        status VARCHAR(20) DEFAULT 'waiting', -- 'waiting', 'active', 'finished'
+        current_player_id UUID,
+        winner_id UUID,
+        target_score INTEGER DEFAULT 100,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+      ```
+
+      ### players table:
+      ```sql
+      CREATE TABLE players (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+        name VARCHAR(50) NOT NULL,
+        total_score INTEGER DEFAULT 0,
+        turn_score INTEGER DEFAULT 0,
+        player_order INTEGER NOT NULL,
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      ```
+
+      ### game_actions table:
+      ```sql
+      CREATE TABLE game_actions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        game_id UUID REFERENCES games(id) ON DELETE CASCADE,
+        player_id UUID REFERENCES players(id) ON DELETE CASCADE,
+        action_type VARCHAR(20) NOT NULL, -- 'roll', 'hold', 'bust'
+        dice_value INTEGER,
+        turn_score INTEGER,
+        total_score INTEGER,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      ```
+
+      ## TypeScript Mapping:
+      Always use these exact field names in TypeScript interfaces to match the database schema.
+
+examples:
+  - input: "Creating game record"
+    output: |
+      ```typescript
+      const { data: game, error } = await supabase
+        .from('games')
+        .insert({
+          game_code: gameCode,
+          status: 'waiting',
+          target_score: 100
+        })
+        .select()
+        .single();
+      ```
+
+metadata:
+  priority: critical
+  version: 1.0
+</rule>
+
+## Real-time Subscriptions
+
+<rule>
+name: realtime_subscriptions
+description: Define real-time subscription patterns for live game updates
+filters:
+  - type: content
+    pattern: "supabase.*subscribe|useEffect.*realtime"
+
+actions:
+  - type: suggest
+    message: |
+      Implement real-time subscriptions for these tables:
+
+      1. **Games table** - for status changes
+      2. **Players table** - for score updates  
+      3. **Game_actions table** - for game history
+
+      Required subscription pattern:
+      ```typescript
+      // Subscribe to game state changes
+      const gameSubscription = supabase
+        .channel(`game:${gameId}`)
+        .on('postgres_changes', 
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'games',
+            filter: `id=eq.${gameId}`
+          }, 
+          (payload) => {
+            // Handle game state updates
+          }
+        )
+        .subscribe();
+
+      // Subscribe to player score changes
+      const playersSubscription = supabase
+        .channel(`players:${gameId}`)
+        .on('postgres_changes',
+          {
+            event: '*',
+            schema: 'public', 
+            table: 'players',
+            filter: `game_id=eq.${gameId}`
+          },
+          (payload) => {
+            // Handle player updates
+          }
+        )
+        .subscribe();
+
+      // Subscribe to game actions
+      const actionsSubscription = supabase
+        .channel(`actions:${gameId}`)
+        .on('postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'game_actions', 
+            filter: `game_id=eq.${gameId}`
+          },
+          (payload) => {
+            // Handle new game actions
+          }
+        )
+        .subscribe();
+
+      // Cleanup subscriptions
+      return () => {
+        supabase.removeChannel(gameSubscription);
+        supabase.removeChannel(playersSubscription);
+        supabase.removeChannel(actionsSubscription);
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## API Function Standards
+
+<rule>
+name: api_function_standards
+description: Define standard patterns for Supabase API functions
+filters:
+  - type: file_pattern
+    pattern: "src/(lib|services)/supabase.*\\.ts$"
+
+actions:
+  - type: suggest
+    message: |
+      Implement these core API functions with proper error handling:
+
+      ```typescript
+      // Game Management Functions
+      export async function createGame(playerName: string): Promise<{ gameCode: string; playerId: string }> {
+        const gameCode = generateGameCode();
+        
+        const { data: game, error: gameError } = await supabase
+          .from('games')
+          .insert({ game_code: gameCode })
+          .select()
+          .single();
+          
+        if (gameError) throw new Error(`Failed to create game: ${gameError.message}`);
+        
+        const { data: player, error: playerError } = await supabase
+          .from('players')
+          .insert({
+            game_id: game.id,
+            name: playerName,
+            player_order: 1
+          })
+          .select()
+          .single();
+          
+        if (playerError) throw new Error(`Failed to create player: ${playerError.message}`);
+        
+        return { gameCode, playerId: player.id };
+      }
+
+      export async function joinGame(gameCode: string, playerName: string): Promise<string> {
+        // Find game by code
+        const { data: game, error: gameError } = await supabase
+          .from('games')
+          .select('id, status')
+          .eq('game_code', gameCode)
+          .single();
+          
+        if (gameError || !game) throw new Error('Game not found');
+        if (game.status !== 'waiting') throw new Error('Game already started');
+        
+        // Get current player count
+        const { count } = await supabase
+          .from('players')
+          .select('*', { count: 'exact' })
+          .eq('game_id', game.id);
+          
+        const { data: player, error: playerError } = await supabase
+          .from('players')
+          .insert({
+            game_id: game.id,
+            name: playerName,
+            player_order: (count || 0) + 1
+          })
+          .select()
+          .single();
+          
+        if (playerError) throw new Error(`Failed to join game: ${playerError.message}`);
+        
+        return player.id;
+      }
+
+      export async function rollDice(gameId: string, playerId: string): Promise<number> {
+        // Server-side dice generation for anti-cheating
+        const diceValue = Math.floor(Math.random() * 6) + 1;
+        
+        // Get current turn score
+        const { data: player } = await supabase
+          .from('players')
+          .select('turn_score, total_score')
+          .eq('id', playerId)
+          .single();
+          
+        const newTurnScore = diceValue === 1 ? 0 : (player?.turn_score || 0) + diceValue;
+        const actionType = diceValue === 1 ? 'bust' : 'roll';
+        
+        // Update player turn score
+        await supabase
+          .from('players')
+          .update({ turn_score: newTurnScore })
+          .eq('id', playerId);
+          
+        // Record action
+        await supabase
+          .from('game_actions')
+          .insert({
+            game_id: gameId,
+            player_id: playerId,
+            action_type: actionType,
+            dice_value: diceValue,
+            turn_score: newTurnScore,
+            total_score: player?.total_score || 0
+          });
+          
+        // If bust, switch turns
+        if (diceValue === 1) {
+          await switchTurn(gameId);
+        }
+        
+        return diceValue;
+      }
+
+      export async function holdTurn(gameId: string, playerId: string): Promise<void> {
+        const { data: player } = await supabase
+          .from('players')
+          .select('turn_score, total_score')
+          .eq('id', playerId)
+          .single();
+          
+        const newTotalScore = (player?.total_score || 0) + (player?.turn_score || 0);
+        
+        // Update player scores
+        await supabase
+          .from('players')
+          .update({ 
+            total_score: newTotalScore,
+            turn_score: 0 
+          })
+          .eq('id', playerId);
+          
+        // Record hold action
+        await supabase
+          .from('game_actions')
+          .insert({
+            game_id: gameId,
+            player_id: playerId,
+            action_type: 'hold',
+            turn_score: player?.turn_score || 0,
+            total_score: newTotalScore
+          });
+          
+        // Check for winner
+        if (newTotalScore >= 100) {
+          await supabase
+            .from('games')
+            .update({ 
+              status: 'finished',
+              winner_id: playerId 
+            })
+            .eq('id', gameId);
+        } else {
+          await switchTurn(gameId);
+        }
+      }
+      ```
+
+      All functions must:
+      1. Include proper error handling
+      2. Use transactions for multi-table operations
+      3. Validate game state before actions
+      4. Return consistent response formats
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

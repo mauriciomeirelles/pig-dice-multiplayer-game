@@ -1,0 +1,422 @@
+---
+description: 
+globs: *.tsx,*.css
+alwaysApply: false
+---
+# UI Components and Styling Rules for Pig Dice Game
+
+## Design System Standards
+
+<rule>
+name: design_system_compliance
+description: Enforce consistent design system across all UI components
+filters:
+  - type: file_pattern
+    pattern: "src/components/.*\\.(tsx|jsx)$"
+
+actions:
+  - type: suggest
+    message: |
+      Follow this exact design system for all UI components:
+
+      ## Color Palette:
+      ```css
+      :root {
+        /* Primary Colors */
+        --primary: #2563eb;        /* Deep blue for main actions */
+        --primary-hover: #1d4ed8;
+        
+        /* Secondary Colors */
+        --secondary: #16a34a;      /* Green for positive actions (Hold) */
+        --secondary-hover: #15803d;
+        
+        /* Status Colors */
+        --danger: #dc2626;         /* Red for errors/risky actions */
+        --danger-hover: #b91c1c;
+        --warning: #ea580c;        /* Orange for turn loss */
+        --warning-hover: #c2410c;
+        
+        /* Neutral Colors */
+        --background: #f9fafb;     /* Light gray background */
+        --surface: #ffffff;        /* White cards */
+        --text-primary: #1f2937;   /* Dark gray text */
+        --text-secondary: #6b7280; /* Medium gray text */
+        --border: #e5e7eb;         /* Light borders */
+        
+        /* Game Colors */
+        --current-player: #3b82f6; /* Highlight for current player */
+        --winner: #10b981;         /* Winner celebration */
+      }
+      ```
+
+      ## Typography Scale:
+      ```css
+      .text-xl { font-size: 1.25rem; }     /* 20px - Large buttons */
+      .text-lg { font-size: 1.125rem; }    /* 18px - Headings */
+      .text-base { font-size: 1rem; }      /* 16px - Body text */
+      .text-sm { font-size: 0.875rem; }    /* 14px - Secondary text */
+      .text-xs { font-size: 0.75rem; }     /* 12px - Captions */
+
+      .font-bold { font-weight: 700; }
+      .font-medium { font-weight: 500; }
+      .font-normal { font-weight: 400; }
+      ```
+
+      ## Spacing System:
+      ```css
+      .space-1 { margin/padding: 0.25rem; }  /* 4px */
+      .space-2 { margin/padding: 0.5rem; }   /* 8px */
+      .space-3 { margin/padding: 0.75rem; }  /* 12px */
+      .space-4 { margin/padding: 1rem; }     /* 16px */
+      .space-6 { margin/padding: 1.5rem; }   /* 24px */
+      .space-8 { margin/padding: 2rem; }     /* 32px */
+      ```
+
+examples:
+  - input: "Creating a primary button"
+    output: |
+      ```tsx
+      const Button: React.FC<ButtonProps> = ({ 
+        variant = 'primary', 
+        size = 'medium',
+        children,
+        ...props 
+      }) => {
+        const baseClasses = 'font-medium rounded-lg transition-colors focus:outline-none focus:ring-2';
+        const variants = {
+          primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+          secondary: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
+          danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
+        };
+        const sizes = {
+          small: 'px-3 py-2 text-sm',
+          medium: 'px-4 py-2 text-base',
+          large: 'px-6 py-3 text-lg'
+        };
+        
+        return (
+          <button 
+            className={`${baseClasses} ${variants[variant]} ${sizes[size]}`}
+            {...props}
+          >
+            {children}
+          </button>
+        );
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## Component Layout Standards
+
+<rule>
+name: component_layout_standards
+description: Define responsive layout patterns for game components
+filters:
+  - type: content
+    pattern: "className|css|style"
+
+actions:
+  - type: suggest
+    message: |
+      Follow these responsive layout patterns:
+
+      ## Mobile-First Responsive Design:
+      ```css
+      /* Mobile (320px - 768px) */
+      .game-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+        max-width: 100%;
+      }
+
+      .player-list {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+
+      /* Tablet (768px - 1024px) */
+      @media (min-width: 768px) {
+        .game-container {
+          grid-template-columns: 1fr 2fr;
+          gap: 1.5rem;
+          padding: 1.5rem;
+        }
+        
+        .player-list {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      /* Desktop (1024px+) */
+      @media (min-width: 1024px) {
+        .game-container {
+          grid-template-columns: 1fr 2fr 1fr;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+        
+        .player-list {
+          grid-template-columns: 1fr;
+        }
+      }
+      ```
+
+      ## Component Sizing:
+      ```css
+      /* Touch targets (minimum 44px) */
+      .touch-target {
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      /* Card components */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Dice display */
+      .dice-container {
+        width: 120px;
+        height: 120px;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: bold;
+        background: var(--surface);
+        border: 2px solid var(--border);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      ```
+
+examples:
+  - input: "Creating responsive game board"
+    output: |
+      ```tsx
+      const GameBoard: React.FC<GameBoardProps> = ({ gameId }) => {
+        return (
+          <div className="game-container">
+            <aside className="player-sidebar">
+              <PlayerList players={players} currentPlayerId={currentPlayer?.id} />
+            </aside>
+            
+            <main className="game-main">
+              <GameStatus currentPlayer={currentPlayer} />
+              <DiceRoller onRoll={handleRoll} disabled={!isMyTurn} />
+              <GameActions 
+                onRoll={handleRoll}
+                onHold={handleHold}
+                disabled={!isMyTurn}
+                turnScore={currentTurnScore}
+              />
+            </main>
+            
+            <aside className="game-history">
+              <GameHistory actions={gameActions} />
+            </aside>
+          </div>
+        );
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
+
+## Animation and Interaction Standards
+
+<rule>
+name: animation_interaction_standards
+description: Define animation and interaction patterns for game components
+filters:
+  - type: content
+    pattern: "animation|transition|hover|active"
+
+actions:
+  - type: suggest
+    message: |
+      Implement these animation and interaction patterns:
+
+      ## Button Interactions:
+      ```css
+      .button {
+        transition: all 150ms ease-in-out;
+        transform: translateY(0);
+      }
+
+      .button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
+      ```
+
+      ## Dice Roll Animation:
+      ```css
+      @keyframes dice-roll {
+        0% { transform: rotate(0deg) scale(1); }
+        25% { transform: rotate(90deg) scale(1.1); }
+        50% { transform: rotate(180deg) scale(1.2); }
+        75% { transform: rotate(270deg) scale(1.1); }
+        100% { transform: rotate(360deg) scale(1); }
+      }
+
+      .dice-rolling {
+        animation: dice-roll 1s ease-in-out;
+      }
+
+      .dice-result {
+        animation: bounce 0.5s ease-out;
+      }
+
+      @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+      }
+      ```
+
+      ## Score Update Animation:
+      ```css
+      @keyframes score-update {
+        0% { transform: scale(1); color: var(--text-primary); }
+        50% { transform: scale(1.2); color: var(--secondary); }
+        100% { transform: scale(1); color: var(--text-primary); }
+      }
+
+      .score-animated {
+        animation: score-update 0.6s ease-out;
+      }
+      ```
+
+      ## Bust Animation (Rolling 1):
+      ```css
+      @keyframes bust-shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+        20%, 40%, 60%, 80% { transform: translateX(4px); }
+      }
+
+      .bust-animation {
+        animation: bust-shake 0.8s ease-in-out;
+        background-color: rgba(220, 38, 38, 0.1);
+        border-color: var(--danger);
+      }
+      ```
+
+      ## Turn Change Transition:
+      ```css
+      .player-card {
+        transition: all 300ms ease-in-out;
+        border: 2px solid transparent;
+      }
+
+      .player-card.current-player {
+        border-color: var(--current-player);
+        background-color: rgba(59, 130, 246, 0.05);
+        transform: scale(1.02);
+      }
+
+      .turn-indicator {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      ```
+
+      ## Loading States:
+      ```css
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+      }
+
+      .skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      ```
+
+examples:
+  - input: "Creating animated dice roller"
+    output: |
+      ```tsx
+      const DiceRoller: React.FC<DiceRollerProps> = ({ onRoll, disabled, loading }) => {
+        const [isRolling, setIsRolling] = useState(false);
+        const [diceValue, setDiceValue] = useState<number | null>(null);
+
+        const handleRoll = async () => {
+          setIsRolling(true);
+          setDiceValue(null);
+          
+          // Wait for animation
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const result = await onRoll();
+          setDiceValue(result);
+          setIsRolling(false);
+        };
+
+        return (
+          <div className="dice-container">
+            <div className={`dice ${isRolling ? 'dice-rolling' : ''} ${diceValue ? 'dice-result' : ''}`}>
+              {isRolling ? '🎲' : diceValue || '🎲'}
+            </div>
+            <button 
+              className="roll-button"
+              onClick={handleRoll}
+              disabled={disabled || loading}
+            >
+              {loading ? <LoadingSpinner /> : 'Roll Dice'}
+            </button>
+          </div>
+        );
+      };
+      ```
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

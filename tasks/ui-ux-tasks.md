@@ -3,39 +3,39 @@
 ## Design System Setup
 
 ### Color Palette Implementation
-- [ ] Define CSS custom properties for color system
-  - [ ] Primary colors (Deep blue #2563eb)
-  - [ ] Secondary colors (Green #16a34a)
-  - [ ] Status colors (Red #dc2626, Orange #ea580c)
-  - [ ] Neutral colors (Background #f9fafb, Text #1f2937)
-  - [ ] Game-specific colors (Current player, Winner)
-- [ ] Create color utility classes
-- [ ] Implement hover and active state variants
+- [x] Define CSS custom properties for color system
+  - [x] Primary colors (Deep blue #2563eb)
+  - [x] Secondary colors (Green #16a34a)
+  - [x] Status colors (Red #dc2626, Orange #ea580c)
+  - [x] Neutral colors (Background #f9fafb, Text #1f2937)
+  - [x] Game-specific colors (Current player, Winner)
+- [x] Create color utility classes
+- [x] Implement hover and active state variants
 - [ ] Test color accessibility (WCAG contrast ratios)
 
 ### Typography System
-- [ ] Set up font imports (Inter, Roboto, JetBrains Mono)
-- [ ] Define typography scale classes
-  - [ ] Headings (.text-xl, .text-lg)
-  - [ ] Body text (.text-base, .text-sm)
-  - [ ] Captions (.text-xs)
-- [ ] Implement font weight utilities
-- [ ] Create monospace classes for scores
+- [x] Set up font imports (Inter, Roboto, JetBrains Mono)
+- [x] Define typography scale classes
+  - [x] Headings (.text-xl, .text-lg)
+  - [x] Body text (.text-base, .text-sm)
+  - [x] Captions (.text-xs)
+- [x] Implement font weight utilities
+- [x] Create monospace classes for scores
 - [ ] Test typography on different screen sizes
 
 ### Spacing & Layout System
-- [ ] Define spacing scale (4px, 8px, 12px, 16px, 24px, 32px)
-- [ ] Create margin/padding utility classes
-- [ ] Implement consistent gap system
-- [ ] Define container max-widths
-- [ ] Set up responsive breakpoints
+- [x] Define spacing scale (4px, 8px, 12px, 16px, 24px, 32px)
+- [x] Create margin/padding utility classes
+- [x] Implement consistent gap system
+- [x] Define container max-widths
+- [x] Set up responsive breakpoints
 
 ### Component Base Styles
-- [ ] Create card component base styles
-- [ ] Define button base styles and variants
-- [ ] Implement input field styles
-- [ ] Create loading spinner styles
-- [ ] Set up focus and accessibility styles
+- [x] Create card component base styles
+- [x] Define button base styles and variants
+- [x] Implement input field styles
+- [x] Create loading spinner styles
+- [x] Set up focus and accessibility styles
 
 ## Core UI Components
 
@@ -105,95 +105,95 @@
 ## Game-Specific Components
 
 ### Game Lobby Components
-- [ ] Create `GameLobby` main container
-- [ ] Implement `CreateGameForm` component
-  - [ ] Player name input
-  - [ ] Create button with loading state
-  - [ ] Error handling display
-- [ ] Implement `JoinGameForm` component
-  - [ ] Game code input with validation
-  - [ ] Player name input
-  - [ ] Join button with feedback
-- [ ] Create game lobby header
-  - [ ] App title and branding
-  - [ ] Navigation elements
-  - [ ] Instructions/help text
-- [ ] Add form validation and feedback
-- [ ] Implement responsive lobby layout
+- [x] Create `GameLobby` main container
+- [x] Implement `CreateGameForm` component
+  - [x] Player name input
+  - [x] Create button with loading state
+  - [x] Error handling display
+- [x] Implement `JoinGameForm` component
+  - [x] Game code input with validation
+  - [x] Player name input
+  - [x] Join button with feedback
+- [x] Create game lobby header
+  - [x] App title and branding
+  - [x] Navigation elements
+  - [x] Instructions/help text
+- [x] Add form validation and feedback
+- [x] Implement responsive lobby layout
 
 ### Game Header Components
-- [ ] Create `GameHeader` component
-  - [ ] Game code display (large, shareable)
-  - [ ] Target score indicator
-  - [ ] Game status badge
-- [ ] Implement copy-to-clipboard functionality
+- [x] Create `GameHeader` component
+  - [x] Game code display (large, shareable)
+  - [x] Target score indicator
+  - [x] Game status badge
+- [x] Implement copy-to-clipboard functionality
 - [ ] Add game timer (optional)
-- [ ] Create responsive header layout
+- [x] Create responsive header layout
 - [ ] Add header animations
 
 ### Player List Components
-- [ ] Create `PlayerList` container component
-- [ ] Implement `PlayerCard` component
-  - [ ] Player name display
-  - [ ] Total score (large, prominent)
-  - [ ] Turn score indicator
-  - [ ] Current player highlighting
-- [ ] Add player status indicators
-  - [ ] Active/inactive states
-  - [ ] Turn indicator (*)
-  - [ ] Winner crown icon
-- [ ] Implement responsive player grid
-  - [ ] Single column (mobile)
-  - [ ] Two columns (tablet)
-  - [ ] Single column (desktop sidebar)
+- [x] Create `PlayerList` container component
+- [x] Implement `PlayerCard` component
+  - [x] Player name display
+  - [x] Total score (large, prominent)
+  - [x] Turn score indicator
+  - [x] Current player highlighting
+- [x] Add player status indicators
+  - [x] Active/inactive states
+  - [x] Turn indicator (*)
+  - [x] Winner crown icon
+- [x] Implement responsive player grid
+  - [x] Single column (mobile)
+  - [x] Two columns (tablet)
+  - [x] Single column (desktop sidebar)
 - [ ] Add player animations
   - [ ] Score counting animations
   - [ ] Turn transition effects
   - [ ] Join/leave animations
 
 ### Dice Display Components
-- [ ] Create `DiceDisplay` component
-  - [ ] Large dice visual (120px)
-  - [ ] Dice value display (emoji or custom)
-  - [ ] Empty state (before first roll)
-- [ ] Implement dice animations
-  - [ ] Rolling animation (1-2 seconds)
-  - [ ] Result reveal animation
-  - [ ] Bust effect (shake/flash)
+- [x] Create `DiceDisplay` component
+  - [x] Large dice visual (120px)
+  - [x] Dice value display (emoji or custom)
+  - [x] Empty state (before first roll)
+- [x] Implement dice animations
+  - [x] Rolling animation (1-2 seconds)
+  - [x] Result reveal animation
+  - [x] Bust effect (shake/flash)
 - [ ] Add dice accessibility
   - [ ] Screen reader announcements
   - [ ] High contrast mode support
   - [ ] Animation preference handling
-- [ ] Create responsive dice sizing
+- [x] Create responsive dice sizing
 - [ ] Add dice sound effects (optional)
 
 ### Game Actions Components
-- [ ] Create `GameActions` container
-- [ ] Implement `RollButton` component
-  - [ ] Large, prominent design
-  - [ ] Loading state during roll
-  - [ ] Disabled state when not turn
-- [ ] Implement `HoldButton` component
-  - [ ] Green color for positive action
-  - [ ] Display current turn score
-  - [ ] Disabled when turn score is 0
-- [ ] Add action feedback
-  - [ ] Success animations
-  - [ ] Error state handling
-  - [ ] Touch feedback
-- [ ] Implement responsive action layout
+- [x] Create `GameActions` container
+- [x] Implement `RollButton` component
+  - [x] Large, prominent design
+  - [x] Loading state during roll
+  - [x] Disabled state when not turn
+- [x] Implement `HoldButton` component
+  - [x] Green color for positive action
+  - [x] Display current turn score
+  - [x] Disabled when turn score is 0
+- [x] Add action feedback
+  - [x] Success animations
+  - [x] Error state handling
+  - [x] Touch feedback
+- [x] Implement responsive action layout
 - [ ] Add keyboard shortcuts
 
 ### Turn Status Components
-- [ ] Create `TurnStatus` component
-  - [ ] Current player name (highlighted)
-  - [ ] Turn score display (large)
-  - [ ] Action instructions
+- [x] Create `TurnStatus` component
+  - [x] Current player name (highlighted)
+  - [x] Turn score display (large)
+  - [x] Action instructions
 - [ ] Implement status animations
   - [ ] Turn change transitions
   - [ ] Score update effects
   - [ ] Player highlighting
-- [ ] Add responsive status layout
+- [x] Add responsive status layout
 - [ ] Create status accessibility features
 
 ### Game History Components

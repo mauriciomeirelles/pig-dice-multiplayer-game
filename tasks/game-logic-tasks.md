@@ -174,78 +174,78 @@
 ## Game Flow Control
 
 ### Game Lifecycle Management
-- [ ] Implement game creation flow
-  - [ ] Initialize game state
-  - [ ] Create first player
-  - [ ] Set waiting status
-  - [ ] Generate shareable code
+- [x] Implement game creation flow
+  - [x] Initialize game state
+  - [x] Create first player
+  - [x] Set waiting status
+  - [x] Generate shareable code
 
-- [ ] Implement player joining flow
-  - [ ] Validate game code
-  - [ ] Check game capacity
-  - [ ] Add player to game
-  - [ ] Update player list
+- [x] Implement player joining flow
+  - [x] Validate game code
+  - [x] Check game capacity
+  - [x] Add player to game
+  - [x] Update player list
 
-- [ ] Implement game start flow
-  - [ ] Validate minimum players
-  - [ ] Set active status
-  - [ ] Initialize first turn
-  - [ ] Notify all players
+- [x] Implement game start flow
+  - [x] Validate minimum players
+  - [x] Set active status
+  - [x] Initialize first turn
+  - [x] Notify all players
 
 ### Turn Flow Management
-- [ ] Implement roll action flow
-  - [ ] Validate turn
-  - [ ] Generate dice value
-  - [ ] Update turn score
-  - [ ] Handle bust scenario
-  - [ ] Record action
+- [x] Implement roll action flow
+  - [x] Validate turn
+  - [x] Generate dice value
+  - [x] Update turn score
+  - [x] Handle bust scenario
+  - [x] Record action
 
-- [ ] Implement hold action flow
-  - [ ] Validate hold ability
-  - [ ] Apply score changes
-  - [ ] Check win condition
-  - [ ] Switch turns
-  - [ ] Record action
+- [x] Implement hold action flow
+  - [x] Validate hold ability
+  - [x] Apply score changes
+  - [x] Check win condition
+  - [x] Switch turns
+  - [x] Record action
 
-- [ ] Implement turn transition flow
-  - [ ] Update current player
-  - [ ] Reset turn state
-  - [ ] Notify players
-  - [ ] Update UI
+- [x] Implement turn transition flow
+  - [x] Update current player
+  - [x] Reset turn state
+  - [x] Notify players
+  - [x] Update UI
 
 ### Game End Flow
-- [ ] Implement win detection
-  - [ ] Monitor score thresholds
-  - [ ] Trigger win condition
-  - [ ] Stop game actions
-  - [ ] Record winner
+- [x] Implement win detection
+  - [x] Monitor score thresholds
+  - [x] Trigger win condition
+  - [x] Stop game actions
+  - [x] Record winner
 
-- [ ] Implement end game cleanup
-  - [ ] Update game status
-  - [ ] Calculate final scores
-  - [ ] Clean up subscriptions
-  - [ ] Show results
+- [x] Implement end game cleanup
+  - [x] Update game status
+  - [x] Calculate final scores
+  - [x] Clean up subscriptions
+  - [x] Show results
 
 ## Custom Hooks Implementation
 
 ### `useGame` Hook
-- [ ] Implement game state management
-  - [ ] Load and track game data
-  - [ ] Provide game actions
-  - [ ] Handle error states
-  - [ ] Manage loading states
+- [x] Implement game state management
+  - [x] Load and track game data
+  - [x] Provide game actions
+  - [x] Handle error states
+  - [x] Manage loading states
 
-- [ ] Implement action handlers
-  - [ ] `rollDice()` function
-  - [ ] `holdTurn()` function
-  - [ ] `joinGame()` function
+- [x] Implement action handlers
+  - [x] `rollDice()` function
+  - [x] `holdTurn()` function
+  - [x] `joinGame()` function (via game creation/joining)
   - [ ] `leaveGame()` function
 
-- [ ] Implement state selectors
-  - [ ] `getCurrentPlayer()`
-  - [ ] `getPlayerScore()`
-  - [ ] `isMyTurn()`
-  - [ ] `getGameStatus()`
+- [x] Implement state selectors
+  - [x] `getCurrentPlayer()`
+  - [x] `getPlayerScore()` (via myPlayer)
+  - [x] `isMyTurn()`
+  - [x] `getGameStatus()`
 
 ### `useDice` Hook
 - [ ] Implement dice state management
