@@ -5,6 +5,7 @@ interface DiceDisplayProps {
   value: number | null;
   rolling: boolean;
   lastAction?: GameAction;
+  myPlayerId: string;
 }
 
 // Dice face emojis
@@ -17,8 +18,9 @@ const DICE_FACES = {
   6: '⚅'
 };
 
-export default function DiceDisplay({ value, rolling, lastAction }: DiceDisplayProps) {
-  const isBust = lastAction?.action_type === 'bust';
+export default function DiceDisplay({ value, rolling, lastAction, myPlayerId }: DiceDisplayProps) {
+  // Only show bust styling if the last action was a bust AND it was my action
+  const isBust = lastAction?.action_type === 'bust' && lastAction?.player_id === myPlayerId;
   
   // Show rolling animation or actual value
   const displayValue = rolling ? Math.floor(Math.random() * 6) + 1 : value;

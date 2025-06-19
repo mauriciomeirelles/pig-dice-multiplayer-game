@@ -174,7 +174,13 @@ export default function GameBoard({ gameId, playerId, gameCode, onBackToLobby }:
 
             {/* Winner Announcement */}
             {gameFinished && winner && (
-              <div className="card text-center mb-xl" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)' }}>
+              <div 
+                className="card text-center mb-xl" 
+                style={{ 
+                  backgroundColor: winner.id === playerId ? 'rgba(16, 185, 129, 0.1)' : 'rgba(243, 244, 246, 0.8)',
+                  borderColor: winner.id === playerId ? 'var(--color-success)' : 'var(--color-border)'
+                }}
+              >
                 <h2 className="text-xl mb-md">🎉 Game Over!</h2>
                 <p className="text-lg">
                   <strong>{winner.name}</strong> wins with {winner.total_score} points!
@@ -194,6 +200,7 @@ export default function GameBoard({ gameId, playerId, gameCode, onBackToLobby }:
                   value={diceValue}
                   rolling={diceRolling}
                   lastAction={actions[0]}
+                  myPlayerId={playerId}
                 />
 
                 <GameActions
