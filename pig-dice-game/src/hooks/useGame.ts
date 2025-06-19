@@ -34,11 +34,14 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
   const [diceRolling, setDiceRolling] = useState(false);
 
   // Load initial game state
-  const loadGameState = useCallback(async () => {
+  const loadGameState = useCallback(async (isInitialLoad = false) => {
     if (!gameId) return;
     
     try {
-      setLoading(true);
+      // Only show loading spinner on initial load, not on updates
+      if (isInitialLoad) {
+        setLoading(true);
+      }
       setError(null);
       const gameState = await gameApi.getGameState(gameId);
       setGame(gameState.game);
@@ -48,7 +51,9 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
       console.error('Error loading game state:', err);
       setError(err instanceof Error ? err.message : 'Failed to load game');
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
     }
   }, [gameId]);
 
@@ -57,16 +62,17 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
     if (!gameId) return;
 
     // Load initial state
-    loadGameState();
+    loadGameState(true);
 
     // Set up polling as backup for real-time subscriptions
     const pollInterval = setInterval(() => {
-      loadGameState();
-    }, 3000); // Poll every 3 seconds
+      // Only poll if we haven't received updates recently
+      loadGameState(false); // false = not initial load, don't show spinner
+    }, 3000); // Poll every 3 seconds as requested
 
-    // Subscribe to games table changes
-    const gamesSubscription = supabase
-      .channel(`game-${gameId}`)
+    // Use a single channel for all real-time updates to avoid conflicts
+    const realtimeSubscription = supabase
+      .channel(`game-updates-${gameId}`)
       .on(
         'postgres_changes',
         {
@@ -76,19 +82,12 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
           filter: `id=eq.${gameId}`,
         },
         (payload) => {
-          console.log('Game updated:', payload);
+          console.log('Game updated via realtime:', payload);
           if (payload.new) {
             setGame(payload.new as Game);
           }
         }
       )
-      .subscribe((status) => {
-        console.log('Games subscription status:', status);
-      });
-
-    // Subscribe to players table changes
-    const playersSubscription = supabase
-      .channel(`players-${gameId}`)
       .on(
         'postgres_changes',
         {
@@ -98,7 +97,7 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
           filter: `game_id=eq.${gameId}`,
         },
         (payload) => {
-          console.log('Players updated:', payload);
+          console.log('Players updated via realtime:', payload);
           if (payload.eventType === 'INSERT') {
             setPlayers(prev => [...prev, payload.new as Player].sort((a, b) => a.player_order - b.player_order));
           } else if (payload.eventType === 'UPDATE') {
@@ -108,13 +107,6 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
           }
         }
       )
-      .subscribe((status) => {
-        console.log('Players subscription status:', status);
-      });
-
-    // Subscribe to game actions
-    const actionsSubscription = supabase
-      .channel(`actions-${gameId}`)
       .on(
         'postgres_changes',
         {
@@ -124,18 +116,18 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
           filter: `game_id=eq.${gameId}`,
         },
         (payload) => {
-          console.log('New action:', payload);
+          console.log('New action via realtime:', payload);
           setActions(prev => [payload.new as GameAction, ...prev].slice(0, 10));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
 
     // Cleanup subscriptions and polling
     return () => {
       clearInterval(pollInterval);
-      gamesSubscription.unsubscribe();
-      playersSubscription.unsubscribe();
-      actionsSubscription.unsubscribe();
+      realtimeSubscription.unsubscribe();
     };
   }, [gameId, loadGameState]);
 
