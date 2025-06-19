@@ -40,20 +40,20 @@
 ## Core UI Components
 
 ### Button Components
-- [ ] Create `Button` component with variants
-  - [ ] Primary button (roll dice, create game)
-  - [ ] Secondary button (hold turn)
-  - [ ] Danger button (leave game)
+- [x] Create `Button` component with variants
+  - [x] Primary button (roll dice, create game)
+  - [x] Secondary button (hold turn)
+  - [x] Danger button (leave game)
   - [ ] Icon buttons for actions
-- [ ] Implement button states
-  - [ ] Default, hover, active, disabled
-  - [ ] Loading state with spinner
-  - [ ] Touch feedback for mobile
+- [x] Implement button states
+  - [x] Default, hover, active, disabled
+  - [x] Loading state with spinner
+  - [x] Touch feedback for mobile
 - [ ] Add accessibility features
   - [ ] ARIA labels and roles
   - [ ] Keyboard navigation
   - [ ] Screen reader support
-- [ ] Create button size variants (small, medium, large)
+- [x] Create button size variants (small, medium, large)
 - [ ] Test button components across devices
 
 ### Input Components
@@ -197,22 +197,22 @@
 - [ ] Create status accessibility features
 
 ### Game History Components
-- [ ] Create `GameHistory` component
-- [ ] Implement `ActionItem` component
-  - [ ] Action type icons (🎲, ✋, 💥)
-  - [ ] Player name and action
-  - [ ] Timestamp (relative)
-  - [ ] Score changes
-- [ ] Add history scrolling
-  - [ ] Auto-scroll to latest
-  - [ ] Manual scroll control
-  - [ ] Show 5-7 recent actions
-- [ ] Implement action animations
-  - [ ] New action slide-in
-  - [ ] Color coding by action type
-  - [ ] Fade out older actions
+- [x] Create `GameHistory` component
+- [x] Implement `ActionItem` component
+  - [x] Action type icons (🎲, ✋, 💥)
+  - [x] Player name and action
+  - [x] Timestamp (relative)
+  - [x] Score changes
+- [x] Add history scrolling
+  - [x] Auto-scroll to latest
+  - [x] Manual scroll control
+  - [x] Show 5-7 recent actions
+- [x] Implement action animations
+  - [x] New action slide-in
+  - [x] Color coding by action type
+  - [x] Fade out older actions
 - [ ] Add history accessibility
-- [ ] Create responsive history layout
+- [x] Create responsive history layout
 
 ## Layout & Navigation
 

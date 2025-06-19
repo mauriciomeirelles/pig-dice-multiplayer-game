@@ -184,8 +184,10 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
     if (!gameId) return;
 
     try {
+      console.log('Starting game:', gameId);
       setError(null);
       await gameApi.startGame(gameId);
+      console.log('Game started successfully');
     } catch (err) {
       console.error('Error starting game:', err);
       setError(err instanceof Error ? err.message : 'Failed to start game');

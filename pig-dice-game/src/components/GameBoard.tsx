@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../hooks/useGame';
 import PlayerList from './PlayerList';
 import DiceDisplay from './DiceDisplay';
@@ -6,6 +6,7 @@ import GameActions from './GameActions';
 import GameHeader from './GameHeader';
 import GameHistory from './GameHistory';
 import TurnStatus from './TurnStatus';
+import { Button } from './ui';
 
 interface GameBoardProps {
   gameId: string;
@@ -15,6 +16,7 @@ interface GameBoardProps {
 }
 
 export default function GameBoard({ gameId, playerId, gameCode, onBackToLobby }: GameBoardProps) {
+  const [startingGame, setStartingGame] = useState(false);
   const gameState = useGame(gameId, playerId);
   
   const {
@@ -32,6 +34,17 @@ export default function GameBoard({ gameId, playerId, gameCode, onBackToLobby }:
     diceValue,
     diceRolling
   } = gameState;
+
+  const handleStartGame = async () => {
+    setStartingGame(true);
+    try {
+      await startGame();
+    } catch (err) {
+      console.error('Error starting game:', err);
+    } finally {
+      setStartingGame(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -109,10 +122,18 @@ export default function GameBoard({ gameId, playerId, gameCode, onBackToLobby }:
               <div className="mt-lg">
                 <button
                   className="btn btn-primary btn-lg"
-                  onClick={startGame}
+                  onClick={handleStartGame}
+                  disabled={startingGame}
                   style={{ width: '100%' }}
                 >
-                  Start Game
+                  {startingGame ? (
+                    <>
+                      <div className="loading" style={{ marginRight: '0.5rem' }}></div>
+                      Starting Game...
+                    </>
+                  ) : (
+                    'Start Game'
+                  )}
                 </button>
               </div>
             )}
