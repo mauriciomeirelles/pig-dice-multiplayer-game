@@ -3,11 +3,16 @@
 ## Core Game Rules Implementation
 
 ### Game Constants & Configuration
-- [ ] Define game constants (TARGET_SCORE, BUST_VALUE, MIN/MAX_PLAYERS)
-- [ ] Create game configuration object
-- [ ] Implement game code generation logic (6 characters)
-- [ ] Add game status enums ('waiting', 'active', 'finished')
-- [ ] Define action types ('roll', 'hold', 'bust')
+- [x] Define game constants (TARGET_SCORE, BUST_VALUE, MIN/MAX_PLAYERS)
+- [x] Create game configuration object
+- [x] Implement game code generation logic (6 characters)
+- [x] Add game status enums ('waiting', 'active', 'finished')
+- [x] Define action types ('roll', 'hold', 'bust')
+- [x] Add customizable target score configuration
+  - [x] Update createGame API to accept target score parameter
+  - [x] Add target score validation (10-1000 range)
+  - [x] Implement dynamic win condition based on game target score
+  - [x] Create UI controls for target score selection during game creation
 
 ### Game State Types & Interfaces
 - [ ] Define `Game` interface with all required fields

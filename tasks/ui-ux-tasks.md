@@ -57,20 +57,24 @@
 - [ ] Test button components across devices
 
 ### Input Components
-- [ ] Create `TextInput` component
-  - [ ] Player name input
-  - [ ] Game code input
-  - [ ] Form validation styling
-- [ ] Implement input states
-  - [ ] Default, focus, error, success
-  - [ ] Loading state for async validation
-  - [ ] Clear/reset functionality
-- [ ] Add input accessories
-  - [ ] Labels and helper text
-  - [ ] Error message display
-  - [ ] Character counters
-- [ ] Implement responsive input sizing
-- [ ] Add accessibility features
+- [x] Create `TextInput` component
+  - [x] Player name input
+  - [x] Game code input
+  - [x] Form validation styling
+- [x] Create `SelectDropdown` component
+  - [x] Target score selection
+  - [x] Custom dropdown arrow styling
+  - [x] Consistent form field appearance
+- [x] Implement input states
+  - [x] Default, focus, error, success
+  - [x] Loading state for async validation
+  - [x] Clear/reset functionality
+- [x] Add input accessories
+  - [x] Labels and helper text
+  - [x] Error message display
+  - [x] Character counters
+- [x] Implement responsive input sizing
+- [x] Add accessibility features
 
 ### Card Components
 - [ ] Create base `Card` component
@@ -108,8 +112,10 @@
 - [x] Create `GameLobby` main container
 - [x] Implement `CreateGameForm` component
   - [x] Player name input
+  - [x] Target score selection dropdown (50-300 points)
   - [x] Create button with loading state
   - [x] Error handling display
+  - [x] Form validation and user feedback
 - [x] Implement `JoinGameForm` component
   - [x] Game code input with validation
   - [x] Player name input
