@@ -17,8 +17,17 @@ interface JoinGameFormProps {
 // Create Game Form Component
 function CreateGameForm({ onGameCreated }: CreateGameFormProps) {
   const [playerName, setPlayerName] = useState('');
+  const [targetScore, setTargetScore] = useState(100);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const targetScoreOptions = [
+    { value: 50, label: '50 points (Quick)' },
+    { value: 100, label: '100 points (Classic)' },
+    { value: 150, label: '150 points (Extended)' },
+    { value: 200, label: '200 points (Long)' },
+    { value: 300, label: '300 points (Marathon)' },
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +36,7 @@ function CreateGameForm({ onGameCreated }: CreateGameFormProps) {
     try {
       setLoading(true);
       setError(null);
-      const { gameCode, playerId } = await gameApi.createGame(playerName.trim());
+      const { gameCode, playerId } = await gameApi.createGame(playerName.trim(), targetScore);
       await onGameCreated(gameCode, playerId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create game');
@@ -54,8 +63,31 @@ function CreateGameForm({ onGameCreated }: CreateGameFormProps) {
             maxLength={50}
             required
           />
-          {error && <div className="error-message">{error}</div>}
         </div>
+        
+        <div className="form-group">
+          <label htmlFor="targetScore" className="label">
+            Target Score
+          </label>
+          <select
+            id="targetScore"
+            className="input"
+            value={targetScore}
+            onChange={(e) => setTargetScore(Number(e.target.value))}
+          >
+            {targetScoreOptions.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="text-xs mt-xs" style={{ color: 'var(--color-text-secondary)' }}>
+            First player to reach {targetScore} points wins!
+          </div>
+        </div>
+        
+        {error && <div className="error-message">{error}</div>}
+        
         <button
           type="submit"
           className="btn btn-primary btn-lg"
@@ -173,7 +205,7 @@ export default function GameLobby({ onGameCreated, onGameJoined }: GameLobbyProp
         <div className="text-center mb-xl">
           <h1 className="text-xl mb-md">🎲 Pig Dice Game</h1>
           <p className="text-base text-secondary">
-            Roll the dice and race to 100 points! But be careful - roll a 1 and lose your turn points!
+            Roll the dice and race to your target score! But be careful - roll a 1 and lose your turn points!
           </p>
         </div>
 
@@ -199,7 +231,7 @@ export default function GameLobby({ onGameCreated, onGameJoined }: GameLobbyProp
           <h3 className="text-lg mb-md text-center">How to Play</h3>
           <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
             <ul style={{ listStyle: 'none', padding: 0 }}>
-              <li className="mb-sm">🎯 <strong>Goal:</strong> First player to reach 100 points wins</li>
+              <li className="mb-sm">🎯 <strong>Goal:</strong> First player to reach the target score wins (customizable when creating)</li>
               <li className="mb-sm">🎲 <strong>Roll:</strong> Roll 2-6 to add points to your turn total</li>
               <li className="mb-sm">✋ <strong>Hold:</strong> Bank your turn points and pass the dice</li>
               <li className="mb-sm">💥 <strong>Bust:</strong> Roll a 1 and lose all turn points!</li>

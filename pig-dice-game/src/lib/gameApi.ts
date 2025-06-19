@@ -38,9 +38,14 @@ export async function generateGameCode(): Promise<string> {
 }
 
 // Create a new game
-export async function createGame(playerName: string): Promise<{ gameCode: string; playerId: string }> {
+export async function createGame(playerName: string, targetScore: number = GAME_CONSTANTS.TARGET_SCORE): Promise<{ gameCode: string; playerId: string }> {
   try {
     const gameCode = await generateGameCode();
+
+    // Validate target score
+    if (targetScore < 10 || targetScore > 1000) {
+      throw new Error('Target score must be between 10 and 1000 points');
+    }
 
     // Create game
     const { data: game, error: gameError } = await supabase
@@ -48,7 +53,7 @@ export async function createGame(playerName: string): Promise<{ gameCode: string
       .insert({
         game_code: gameCode,
         status: 'waiting',
-        target_score: GAME_CONSTANTS.TARGET_SCORE,
+        target_score: targetScore,
       })
       .select()
       .single();
@@ -73,7 +78,7 @@ export async function createGame(playerName: string): Promise<{ gameCode: string
     return { gameCode, playerId: player.id };
   } catch (error) {
     console.error('Error creating game:', error);
-    throw new Error('Failed to create game');
+    throw error instanceof Error ? error : new Error('Failed to create game');
   }
 }
 
