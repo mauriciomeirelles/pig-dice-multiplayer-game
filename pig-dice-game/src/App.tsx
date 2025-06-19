@@ -28,15 +28,27 @@ function App() {
     }
   };
 
-  const handleGameJoined = (gameId: string, playerId: string) => {
-    // Extract gameCode from the gameId if it's a gameCode
-    // This is a bit of a hack - in a real app you'd want cleaner state management
-    setAppState({
-      screen: 'game',
-      gameId,
-      playerId,
-      gameCode: gameId.length === 6 ? gameId : 'UNKNOWN'
-    });
+  const handleGameJoined = async (gameId: string, playerId: string) => {
+    try {
+      // Get the game state to get the correct game code
+      const gameApi = await import('./lib/gameApi');
+      const gameState = await gameApi.getGameState(gameId);
+      setAppState({
+        screen: 'game',
+        gameId,
+        playerId,
+        gameCode: gameState.game.game_code
+      });
+    } catch (error) {
+      console.error('Error fetching game state for join:', error);
+      // Fallback
+      setAppState({
+        screen: 'game',
+        gameId,
+        playerId,
+        gameCode: 'UNKNOWN'
+      });
+    }
   };
 
   const handleBackToLobby = () => {

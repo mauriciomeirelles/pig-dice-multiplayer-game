@@ -6,7 +6,7 @@ import GameActions from './GameActions';
 import GameHeader from './GameHeader';
 import GameHistory from './GameHistory';
 import TurnStatus from './TurnStatus';
-import { Button } from './ui';
+
 
 interface GameBoardProps {
   gameId: string;
@@ -137,6 +137,17 @@ export default function GameBoard({ gameId, playerId, gameCode, onBackToLobby }:
                 </button>
               </div>
             )}
+
+            {/* Debug: Force Refresh */}
+            <div className="mt-md">
+              <button
+                className="btn btn-secondary"
+                onClick={() => window.location.reload()}
+                style={{ width: '100%' }}
+              >
+                🔄 Refresh Page
+              </button>
+            </div>
 
             {/* Waiting for Players */}
             {game.status === 'waiting' && players.length < 2 && (

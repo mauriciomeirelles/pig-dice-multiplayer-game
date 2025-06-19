@@ -52,12 +52,17 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
     }
   }, [gameId]);
 
-  // Set up real-time subscriptions
+  // Set up real-time subscriptions and polling backup
   useEffect(() => {
     if (!gameId) return;
 
     // Load initial state
     loadGameState();
+
+    // Set up polling as backup for real-time subscriptions
+    const pollInterval = setInterval(() => {
+      loadGameState();
+    }, 3000); // Poll every 3 seconds
 
     // Subscribe to games table changes
     const gamesSubscription = supabase
@@ -77,7 +82,9 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Games subscription status:', status);
+      });
 
     // Subscribe to players table changes
     const playersSubscription = supabase
@@ -101,7 +108,9 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Players subscription status:', status);
+      });
 
     // Subscribe to game actions
     const actionsSubscription = supabase
@@ -121,8 +130,9 @@ export function useGame(gameId: string, playerId: string): UseGameReturn {
       )
       .subscribe();
 
-    // Cleanup subscriptions
+    // Cleanup subscriptions and polling
     return () => {
+      clearInterval(pollInterval);
       gamesSubscription.unsubscribe();
       playersSubscription.unsubscribe();
       actionsSubscription.unsubscribe();

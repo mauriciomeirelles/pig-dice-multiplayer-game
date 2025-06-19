@@ -3,7 +3,7 @@ import * as gameApi from '../lib/gameApi';
 
 interface GameLobbyProps {
   onGameCreated: (gameCode: string, playerId: string) => Promise<void>;
-  onGameJoined: (gameId: string, playerId: string) => void;
+  onGameJoined: (gameId: string, playerId: string) => Promise<void>;
 }
 
 interface CreateGameFormProps {
@@ -11,7 +11,7 @@ interface CreateGameFormProps {
 }
 
 interface JoinGameFormProps {
-  onGameJoined: (gameId: string, playerId: string) => void;
+  onGameJoined: (gameId: string, playerId: string) => Promise<void>;
 }
 
 // Create Game Form Component
@@ -94,7 +94,7 @@ function JoinGameForm({ onGameJoined }: JoinGameFormProps) {
       
       // We need to get the game ID from the game code
       const gameState = await gameApi.getGameState(gameCode.trim().toUpperCase());
-      onGameJoined(gameState.game.id, playerId);
+      await onGameJoined(gameState.game.id, playerId);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to join game');
     } finally {
