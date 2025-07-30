@@ -27,6 +27,7 @@ function CreateGameForm({ onGameCreated }: CreateGameFormProps) {
     { value: 150, label: '150 points (Extended)' },
     { value: 200, label: '200 points (Long)' },
     { value: 300, label: '300 points (Marathon)' },
+    { value: 500, label: '500 points (Epic)' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
